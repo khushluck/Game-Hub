@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fun Game Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Press Start 2P', cursive;
+      background: linear-gradient(to right, #2c3e50, #3498db);
+      color: white;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      animation: flicker 1.5s infinite;
+    }
+    @keyframes flicker {
+      0%, 100% {opacity: 1;}
+      50% {opacity: 0.5;}
+    }
+    button {
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #d35400;
+    }
+    #gameArea {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      min-height: 200px;
+    }
+    .surprise {
+      font-size: 22px;
+      margin-top: 20px;
+      color: yellow;
+    }
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Welcome to the Surprise Game Hub! 🎉</h1>
+  <p>Select a game to start playing:</p>
+  <button onclick="playGame('rps')">Rock, Paper, Scissors</button>
+  <button onclick="playGame('ttt')">Tic Tac Toe</button>
+  <button onclick="playGame('quiz')">Quiz Game</button>
+  <button onclick="playGame('tod')">Truth or Dare</button>
+  <div id="gameArea"></div>
+  <p class="surprise" id="surprise"></p>
+
+  <audio autoplay loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-epic.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    function playGame(game) {
+      const area = document.getElementById('gameArea');
+      const surprise = document.getElementById('surprise');
+      surprise.innerText = '';
+
+      if (game === 'rps') {
+        const choices = ['Rock', 'Paper', 'Scissors'];
+        const userChoice = prompt('Choose Rock, Paper or Scissors:');
+        const computerChoice = choices[Math.floor(Math.random() * 3)];
+        let result = '';
+
+        if (!choices.map(c => c.toLowerCase()).includes(userChoice?.toLowerCase())) {
+          result = 'Invalid choice!';
+        } else {
+          if (userChoice.toLowerCase() === computerChoice.toLowerCase()) {
+            result = `It's a tie! You both chose ${computerChoice}`;
+          } else if (
+            (userChoice.toLowerCase() === 'rock' && computerChoice === 'Scissors') ||
+            (userChoice.toLowerCase() === 'paper' && computerChoice === 'Rock') ||
+            (userChoice.toLowerCase() === 'scissors' && computerChoice === 'Paper')
+          ) {
+            result = `You win! Computer chose ${computerChoice}`;
+          } else {
+            result = `You lose! Computer chose ${computerChoice}`;
+          }
+        }
+        area.innerHTML = `<h2>Rock, Paper, Scissors</h2><p>${result}</p>`;
+        surprise.innerText = '🪨📄✂️ Choose wisely!';
+
+      } else if (game === 'ttt') {
+        area.innerHTML = `
+        <h2>Tic Tac Toe</h2>
+        <p>Player X starts!</p>
+        <table id="board" style="margin:auto; font-size:24px">
+          ${[0,1,2].map(i => `
+            <tr>
+              ${[0,1,2].map(j => `<td onclick="makeMove(this, ${i}, ${j})" style="width:60px; height:60px; border:2px solid white; cursor:pointer"></td>`).join('')}
+            </tr>`).join('')}
+        </table>`;
+        surprise.innerText = '⭕❌ Get ready for a strategic battle!';
+        window.boardState = Array(3).fill().map(() => Array(3).fill(''));
+        window.currentPlayer = 'X';
+      } else if (game === 'quiz') {
+        const questions = [
+          { q: 'What year did WW1 begin?', a: '1914' },
+          { q: 'Who wrote the Declaration of Independence?', a: 'thomas jefferson' },
+          { q: 'What is the capital of France?', a: 'paris' },
+          { q: 'How many continents are there?', a: '7' },
+          { q: 'What is the boiling point of water in Celsius?', a: '100' }
+        ];
+        let score = 0;
+        let qIndex = 0;
+        function askQuestion() {
+          if (qIndex >= questions.length) {
+            area.innerHTML = `<h2>Quiz Complete!</h2><p>Your Score: ${score}/${questions.length}</p>`;
+            surprise.innerText = '🧠 Well done, quiz master!';
+            return;
+          }
+          const userAnswer = prompt(questions[qIndex].q);
+          if (userAnswer?.trim().toLowerCase() === questions[qIndex].a) {
+            score++;
+            alert('Correct!');
+          } else {
+            alert(`Wrong! The correct answer was ${questions[qIndex].a}`);
+          }
+          qIndex++;
+          askQuestion();
+        }
+        askQuestion();
+      } else if (game === 'tod') {
+        const truths = [
+          "What's a secret you've never told anyone?",
+          "Who was your first crush?",
+          "Have you ever lied to get out of trouble?",
+          "What's the most embarrassing thing you've ever done?",
+          "If you could switch lives with someone for a day, who would it be?"
+        ];
+        const dares = [
+          "Do 10 jumping jacks.",
+          "Sing your favorite song out loud.",
+          "Do your best celebrity impression.",
+          "Act like a chicken for 30 seconds.",
+          "Dance without music for 30 seconds."
+        ];
+        const choice = prompt("Truth or Dare?").toLowerCase();
+        if (choice === 'truth') {
+          area.innerHTML = `<h2>Truth</h2><p>${truths[Math.floor(Math.random() * truths.length)]}</p>`;
+        } else if (choice === 'dare') {
+          area.innerHTML = `<h2>Dare</h2><p>${dares[Math.floor(Math.random() * dares.length)]}</p>`;
+        } else {
+          area.innerHTML = `<p>Invalid choice!</p>`;
+        }
+        surprise.innerText = '🤔😜 Prepare for some fun confessions and dares!';
+      }
+    }
+
+    function makeMove(cell, i, j) {
+      if (window.boardState[i][j]) return;
+      cell.innerText = window.currentPlayer;
+      window.boardState[i][j] = window.currentPlayer;
+      if (checkWinner(window.boardState, window.currentPlayer)) {
+        alert(`Player ${window.currentPlayer} wins!`);
+        playGame('ttt');
+        return;
+      }
+      if (window.boardState.flat().every(c => c)) {
+        alert('Draw!');
+        playGame('ttt');
+        return;
+      }
+      window.currentPlayer = window.currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    function checkWinner(board, player) {
+      return (
+        [0,1,2].some(i => board[i].every(cell => cell === player)) ||
+        [0,1,2].some(i => board.every(row => row[i] === player)) ||
+        [0,1,2].every(i => board[i][i] === player) ||
+        [0,1,2].every(i => board[i][2 - i] === player)
+      );
+    }
+  </script>
+</body>
+</html>
